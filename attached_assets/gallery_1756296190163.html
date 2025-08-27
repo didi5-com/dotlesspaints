@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Gallery - Doctless Paint</title>
+	<link href="https://fonts.googleapis.com/css2?family=Pacifico&amp;display=swap" rel="stylesheet" />
+	<style type="text/css">body {
+      font-family: 'Arial', sans-serif;
+      background-color: #5A91E1;
+      color: #000;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-family: "Pacifico", cursive;
+      color: #fff;
+    }
+
+    .form-container {
+      background: #141D26;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      color: #fff;
+      display: inline-block;
+    }
+
+    .form-container input, .form-container textarea, .form-container button, .form-container select {
+      display: block;
+      margin: 10px auto;
+      width: 80%;
+      padding: 10px;
+    }
+
+    .gallery, .folder-view {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .gallery-item, .folder-item {
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      width: 200px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .gallery-item img, .gallery-item video, 
+    .folder-item img, .folder-item video {
+      max-width: 100%;
+      border-radius: 5px;
+    }
+
+    .gallery-item button, .folder-item button {
+      background-color: #ff0000;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .folder-section {
+      margin-top: 40px;
+    }
+	</style>
+</head>
+<body>
+<h1>Gallery - Doctless Paint</h1>
+
+<div class="form-container" id="formContainer">
+<h3>Create a Post</h3>
+<input id="accessKey" placeholder="Enter Access Key" type="password" /> <input id="postTitle" placeholder="Post Title" type="text" /><textarea id="postContent" placeholder="Post Content"></textarea> <select id="fileType"><option value="image">Image</option><option value="video">Video</option> </select> <input accept="image/*,video/*" id="postFile" type="file" /><button onclick="createPost()">Post</button></div>
+
+<div class="gallery" id="gallery"></div>
+
+<div class="folder-section">
+<h2>Saved Posts</h2>
+
+<div class="folder-view" id="folderView"></div>
+</div>
+<script>
+    const ACCESS_KEY = "didi5566"; // Replace with your key
+
+    // Function to load posts from localStorage
+    function loadPosts() {
+      const gallery = document.getElementById('gallery');
+      const folderView = document.getElementById('folderView');
+      gallery.innerHTML = '';
+      folderView.innerHTML = '';
+
+      const posts = JSON.parse(localStorage.getItem('galleryPosts')) || [];
+
+      posts.forEach((post, index) => {
+        if (post.type === "image" || post.type === "video") {
+          const galleryItem = createGalleryItem(post, index);
+          const folderItem = createGalleryItem(post, index);
+
+          gallery.appendChild(galleryItem);
+          folderView.appendChild(folderItem);
+        }
+      });
+    }
+
+    function createGalleryItem(post, index) {
+      const item = document.createElement('div');
+      item.classList.add('gallery-item');
+      let content;
+
+      if (post.type === "image") {
+        content = `<img src="${post.file}" alt="${post.title}">`;
+      } else if (post.type === "video") {
+        content = `<video controls><source src="${post.file}" type="video/mp4"></video>`;
+      }
+
+      item.innerHTML = `
+        <h4>${post.title}</h4>
+        ${content}
+        <p>${post.content}</p>
+        <button onclick="deletePost(${index})">Delete</button>
+      `;
+
+      return item;
+    }
+
+    // Function to create a new post
+    function createPost() {
+      const accessKey = document.getElementById('accessKey').value;
+      const title = document.getElementById('postTitle').value;
+      const content = document.getElementById('postContent').value;
+      const fileType = document.getElementById('fileType').value;
+      const fileInput = document.getElementById('postFile');
+      const file = fileInput.files[0];
+
+      if (accessKey !== ACCESS_KEY) {
+        alert('Invalid access key!');
+        return;
+      }
+
+      if (!title || !content || !file) {
+        alert('All fields are required!');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const posts = JSON.parse(localStorage.getItem('galleryPosts')) || [];
+        posts.push({
+          title,
+          content,
+          file: reader.result,
+          type: fileType,
+        });
+
+        localStorage.setItem('galleryPosts', JSON.stringify(posts));
+        loadPosts();
+
+        // Clear form
+        document.getElementById('postTitle').value = '';
+        document.getElementById('postContent').value = '';
+        fileInput.value = '';
+        document.getElementById('accessKey').value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Function to delete a post
+    function deletePost(index) {
+      const accessKey = prompt("Enter access key to delete this post:");
+      if (accessKey !== ACCESS_KEY) {
+        alert("Invalid access key!");
+        return;
+      }
+
+      const posts = JSON.parse(localStorage.getItem('galleryPosts')) || [];
+      posts.splice(index, 1);
+      localStorage.setItem('galleryPosts', JSON.stringify(posts));
+      loadPosts();
+    }
+
+       
+  </script></body>
+</html>

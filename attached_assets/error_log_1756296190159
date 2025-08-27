@@ -1,0 +1,10 @@
+[10-Dec-2024 21:27:19 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'username'@'localhost' (using password: YES) in /home/cycgdfkz/public_html/upload.php:14
+Stack trace:
+#0 /home/cycgdfkz/public_html/upload.php(14): mysqli->__construct('localhost', 'username', Object(SensitiveParameterValue), 'database_name')
+#1 {main}
+  thrown in /home/cycgdfkz/public_html/upload.php on line 14
+[10-Dec-2024 21:28:40 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'username'@'localhost' (using password: YES) in /home/cycgdfkz/public_html/upload.php:14
+Stack trace:
+#0 /home/cycgdfkz/public_html/upload.php(14): mysqli->__construct('localhost', 'username', Object(SensitiveParameterValue), 'database_name')
+#1 {main}
+  thrown in /home/cycgdfkz/public_html/upload.php on line 14

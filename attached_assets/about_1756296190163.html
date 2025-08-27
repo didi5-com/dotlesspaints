@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="WhatsApp_Image_2024-12-07_at_2.25.14_PM-removebg-preview.png" rel="icon" />
+	<title>About Us - Doctless Paint</title>
+	<style type="text/css">body {
+      font-family: 'Arial', sans-serif;
+      background-color: #663378;
+      color: #000;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #141D26;
+      padding: 1em;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      color: #fff;
+      font-size: 1.5em;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+   
+    .menu-toggle {
+      width: 30px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .menu-toggle span {
+      display: block;
+      height: 4px;
+      background-color: #fff;
+      border-radius: 2px;
+      transition: transform 0.3s ease;
+    }
+
+    .circular-menu {
+      position: fixed;
+      bottom: 100px;
+      right: 100px;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: scale(0) rotate(0deg);
+      transition: transform 0.4s ease;
+      z-index: 1500;
+    }
+
+    .circular-menu.show-menu {
+      transform: scale(1) rotate(360deg);
+    }
+
+    .circular-menu ul {
+      list-style: none;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .circular-menu li {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #3E4A59;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .circular-menu li a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1em;
+      text-align: center;
+      transition: color 0.3s ease;
+    }
+
+    /* Radial layout for menu items */
+    .circular-menu li:nth-child(1) { transform: rotate(0deg) translate(100px); }
+    .circular-menu li:nth-child(2) { transform: rotate(60deg) translate(100px); }
+    .circular-menu li:nth-child(3) { transform: rotate(120deg) translate(100px); }
+    .circular-menu li:nth-child(4) { transform: rotate(180deg) translate(100px); }
+    .circular-menu li:nth-child(5) { transform: rotate(240deg) translate(100px); }
+    .circular-menu li:nth-child(6) { transform: rotate(300deg) translate(100px); }
+
+    .circular-menu li:hover {
+      transform: scale(1.2) translate(100px);
+      background-color: #ffcc00;
+    }
+
+    .circular-menu li a:hover {
+      color: #141D26;
+    }
+
+    .menu-toggle:hover span {
+      background-color: #ffcc00;
+    }
+    .slideshow {
+      margin: 2em auto;
+      padding: 1em;
+      border: 5px solid #fff;
+      background: #141D26;
+      max-width: 500px;
+      position: relative;
+    }
+    
+    .slideshow img {
+      width: 400px; /* Specific width */
+      height: 300px; /* Specific height */
+      object-fit: cover; /* Ensures images maintain aspect ratio */
+      border-radius: 5px;
+    }
+
+    .about-us-section {
+      padding: 3em 1em;
+      text-align: center;
+    }
+
+    .about-us-section h2 {
+      font-size: 2.5em;
+      color: #fffb1a;
+    }
+
+    .imglogo {
+      display: flex;
+      align-items: center; /* Vertically align the image and text */
+      gap: 30px; /* Add spacing between image and heading */
+    }
+    
+    .imglogo img {
+      height: 180px; /* Adjust height of the image */
+      width: auto; /* Maintain aspect ratio */
+    }
+    
+    .imglogo h2 {
+      margin: 0; /* Remove default margin */
+      font-size: 2em; /* Adjust heading size */
+      color: #fffb1a; /* Ensure it matches other headings */
+    }
+    
+    .about-us-section img{
+      position: center;
+    }
+
+    .about-us-section p {
+      font-size: 1.6em;
+      color: #fff;
+      max-width: 800px;
+      margin: 1em auto;
+    }
+
+    footer {
+      background: #141D26;
+      color: #fff;
+      text-align: center;
+      padding: 1em 0;
+      margin-top: auto;
+    }
+	</style>
+</head>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="119195" async data-cfasync="false"></script>
+<body><!-- Header -->
+<header>
+<p></p>
+<img alt="Doctless Paint Logo" src="WhatsApp_Image_2024-12-07_at_2.25.14_PM-removebg-preview.png" style="max-width: 80px; height: auto;" /> <!-- Circular Menu --><button class="menu-button" onclick="toggleMenu()">☰</button>
+
+<div class="circular-menu" id="circularMenu">
+<ul>
+	<li><a href="index.html">Home</a></li>
+	<li><a href="about.html">About</a></li>
+	<li><a href="purchase.html">Cart</a></li>
+	<li><a href="terms.html">Terms</a></li>
+	<li><a href="cart.html">Houses</a></li>
+	<li><a href="post.html">Gallery</a></li>
+</ul>
+</div>
+</header>
+<!-- Slideshow -->
+
+<div class="slideshow"><img alt="Slide 1" src="Amerhart _ Adding class and value to home exteriors.jpeg" /> <img alt="Slide 2" src="Does your house look tired, dull, and worn_ Are you ready to give your home a “facelift”_ Interior painting allows you to change the look and feel of your home instantly_  A fresh coat of paint can make your house look fresh. In addition,.  CALL PROFE" /> <img alt="Slide 3" src="hkc.jpg" /></div>
+<!-- Circular Menu --><!-- About Us Section -->
+
+<section class="about-us-section">
+<div class="imglogo"><img alt="Logo" src="IMG-20241111-WA0024-removebg-preview.png" />
+<h2>All Purpose Synthetic Enamel</h2>
+</div>
+
+<p>Dotless All Purpose Synthetic Enamel is top quality sysnthetic enamel made from highest quality resin pigments used for all kinds of wood and metal surfaces. The careful selection of pigment translates into a superior quality product that makes your interiors and exterior really stands out.It has maximum gloss retention and outstaning capacity. It also Provides long-lasting durability to your wood and metalsurfaces.<br />
+<br>CORE VALUES </br> DOTLESS PAINT ENTERPRISE&nbsp;<br />
+Quality and Excellent is our watch world.</p>
+<img height="580px" src="images /Brown_paint_brush_art__Paintbrush_Painting__brushes__pencil__color__palette_png-removebg-preview.png" /></section>
+<!-- WhatsApp Link -->
+
+<p><a href="https://wa.me/2348119563832" style="position: fixed; bottom: 20px; right: 20px;" target="_blank"><img alt="WhatsApp" src="—Pngtree—whatsapp icon whatsapp logo free_5990837.png" style="width: 83px; height: 83px;" /> </a> <!-- Footer --></p>
+
+<footer>
+<p>&copy;<br />
+DELTA OFFICE<br />
+NO. 26 DSC Ughelli Patani, Express Road, Warri Delta State<br />
+ABUJA OFFICE&nbsp;&nbsp;<br />
+Apo resettlement, Zone E. Off MTN mast road, &nbsp; No-7 Mgbahurike street.</p>
+</footer>
+<script>
+    function toggleMenu() {
+      const menu = document.getElementById("circularMenu");
+      menu.classList.toggle("show-menu");
+    }
+
+    // Simple slideshow functionality
+    const slides = document.querySelectorAll('.slideshow img');
+    let currentIndex = 0;
+
+    setInterval(() => {
+      slides[currentIndex].style.display = 'none';
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides[currentIndex].style.display = 'block';
+    }, 3000);
+
+    // Initialize slideshow
+    slides.forEach((slide, index) => {
+      slide.style.display = index === 0 ? 'block' : 'none';
+    });
+  </script></body>
+</html>
