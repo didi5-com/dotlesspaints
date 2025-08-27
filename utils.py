@@ -1,10 +1,9 @@
 import os
+import json
 import secrets
 from PIL import Image
-from flask import current_app, url_for
-from werkzeug.utils import secure_filename
 from models import SiteCustomization, PaymentMethod
-import json
+from flask import current_app
 
 
 def allowed_file(filename):
@@ -85,20 +84,24 @@ def get_active_payment_methods():
     return PaymentMethod.query.filter_by(is_active=True).all()
 
 
-def format_payment_config(config_json):
-    """Parse and format payment method configuration"""
-    if not config_json:
+def format_payment_config(config_str):
+    """Format payment configuration for display"""
+    if not config_str:
         return {}
-
     try:
-        return json.loads(config_json)
-    except json.JSONDecodeError:
-        return {}
-
-
-def from_json(value):
-    """Template filter to parse JSON strings"""
-    try:
-        return json.loads(value) if value else {}
+        return json.loads(config_str)
     except:
         return {}
+
+def from_json(value):
+    """Template filter to convert JSON string to dict"""
+    if not value:
+        return {}
+    try:
+        return json.loads(value)
+    except:
+        return {}
+
+# Register template filter
+def register_template_filters(app):
+    app.jinja_env.filters['from_json'] = from_json

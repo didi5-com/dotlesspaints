@@ -332,127 +332,95 @@ function initSearchFunctionality() {
 }
 
 // Payment method selection
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
-
-    paymentRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            // Hide all payment details
-            document.querySelectorAll('.payment-details').forEach(detail => {
-                detail.style.display = 'none';
-            });
-
-            // Show selected payment details
-            const selectedDetails = document.querySelector('#payment-details-' + this.value);
-            if (selectedDetails) {
-                selectedDetails.style.display = 'block';
-            }
+document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        // Hide all payment details
+        document.querySelectorAll('.payment-details').forEach(detail => {
+            detail.style.display = 'none';
         });
+
+        // Show selected payment method details
+        const selectedDetails = document.querySelector(`.payment-details[data-payment-method="${this.value}"]`);
+        if (selectedDetails) {
+            selectedDetails.style.display = 'block';
+        }
     });
+});
 
-    // Initialize Paystack payment
-    const paystackBtn = document.querySelector('#paystack-btn');
-    if (paystackBtn) {
-        paystackBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            const amountField = document.querySelector('#amount');
-            const emailField = document.querySelector('#email');
-            const referenceField = document.querySelector('#reference');
-            const publicKeyField = document.querySelector('#paystack-public-key');
-
-            if (!amountField || !emailField || !referenceField || !publicKeyField) {
-                alert('Payment form is missing required fields');
-                return;
-            }
-
-            const amount = parseInt(amountField.value) * 100; // Convert to kobo
-            const email = emailField.value;
-            const reference = referenceField.value;
-
-            let handler = PaystackPop.setup({
-                key: publicKeyField.value,
-                email: email,
-                amount: amount,
+// Paystack payment integration
+const paystackBtn = document.getElementById('paystack-btn');
+if (paystackBtn) {
+    const paymentData = paystackBtn.dataset;
+    paystackBtn.addEventListener('click', function() {
+        if (typeof PaystackPop !== 'undefined' && paymentData.publicKey && paymentData.email && paymentData.amount && paymentData.orderId) {
+            const handler = PaystackPop.setup({
+                key: paymentData.publicKey,
+                email: paymentData.email,
+                amount: parseInt(paymentData.amount) * 100,
                 currency: 'NGN',
-                ref: reference,
                 callback: function(response) {
-                    // Payment successful
-                    const paystackRefField = document.querySelector('#paystack-reference');
-                    if (paystackRefField) {
-                        paystackRefField.value = response.reference;
-                    }
-                    const paymentForm = document.querySelector('#payment-form');
-                    if (paymentForm) {
-                        paymentForm.submit();
-                    }
+                    window.location.href = `/verify_payment/${paymentData.orderId}?reference=${response.reference}`;
                 },
                 onClose: function() {
                     alert('Payment cancelled');
                 }
             });
-
             handler.openIframe();
+        } else {
+            alert('Payment system not properly configured');
+        }
+    });
+}
+
+// Manual payment confirmation
+function confirmManualPayment(orderId) {
+    if (confirm('Have you completed the bank transfer? This will mark your payment as pending verification.')) {
+        fetch(`/confirm_manual_payment/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
         });
     }
+}
 
-    // Handle crypto payment
-    const cryptoBtn = document.querySelector('#crypto-btn');
-    if (cryptoBtn) {
-        cryptoBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            const walletField = document.querySelector('#crypto-wallet');
-            const amountField = document.querySelector('#crypto-amount');
-
-            if (!walletField || !amountField) {
-                alert('Crypto form fields are missing');
-                return;
+// Crypto payment confirmation
+function confirmCryptoPayment(orderId) {
+    if (confirm('Have you sent the cryptocurrency payment? This will mark your payment as pending verification.')) {
+        fetch(`/confirm_crypto_payment/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             }
-
-            const walletAddress = walletField.value;
-            const amount = amountField.value;
-
-            if (!walletAddress || !amount) {
-                alert('Please fill in all crypto payment details');
-                return;
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
             }
-
-            // Submit crypto payment form
-            const cryptoForm = document.querySelector('#crypto-form');
-            if (cryptoForm) {
-                cryptoForm.submit();
-            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
         });
     }
-
-    // Handle bank transfer
-    const bankBtn = document.querySelector('#bank-btn');
-    if (bankBtn) {
-        bankBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            // Submit bank transfer form
-            const bankForm = document.querySelector('#bank-form');
-            if (bankForm) {
-                bankForm.submit();
-            }
-        });
-    }
-
-    // Handle form submission
-    const checkoutForm = document.querySelector('#checkout-form');
-    if (checkoutForm) {
-        checkoutForm.addEventListener('submit', function(e) {
-            const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
-            if (!selectedPayment) {
-                e.preventDefault();
-                alert('Please select a payment method');
-                return;
-            }
-        });
-    }
-});
+}
 
 // Product image preview
 function previewImage(input) {

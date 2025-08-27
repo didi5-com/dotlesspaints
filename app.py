@@ -61,8 +61,13 @@ app.register_blueprint(admin_bp, url_prefix='/admin')
 app.register_blueprint(google_auth_bp, url_prefix='/google_auth')
 
 # Register template filters
-from utils import from_json
-app.jinja_env.filters['from_json'] = from_json
+from utils import get_site_styles, register_template_filters
+
+# Apply custom styles
+app.jinja_env.globals['get_site_styles'] = get_site_styles
+
+# Register template filters
+register_template_filters(app)
 
 with app.app_context():
     db.create_all()
