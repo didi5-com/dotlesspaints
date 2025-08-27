@@ -29,10 +29,10 @@ https://docs.replit.com/additional-resources/google-auth-in-flask#set-up-your-oa
 
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
-google_auth = Blueprint("google_auth", __name__)
+google_auth_bp = Blueprint("google_auth", __name__)
 
 
-@google_auth.route("/google_login")
+@google_auth_bp.route("/google_login")
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
@@ -54,7 +54,7 @@ def login():
         return redirect(url_for('auth.login'))
 
 
-@google_auth.route("/google_login/callback")
+@google_auth_bp.route("/google_login/callback")
 def callback():
     try:
         code = request.args.get("code")
