@@ -1,0 +1,95 @@
+The error sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column order.payment_method_id does not exist indicates that the payment_method_id column does not exist in your order table.
+
+This problem may arise from not successfully adding the column after you initially defined it in your Order model in models.py. Here’s how to fix it:
+
+Check Column Existence Logic: Ensure you are properly checking if the column exists and adding it if needed.
+
+Run Migration Again: If you haven't used migrations yet, you should create a migration to add the column or manually check the database schema.
+
+Here is a step-by-step approach to solve this:
+
+Update  to Ensure Column is Added
+Make sure your column addition logic in  is executed. Let's ensure that the column payment_method_id is correctly added:
+
+from app import app, db
+if __name__ == '__main__':
+    with app.app_context():
+        # Import models first
+        from models import PaymentMethod, Order
+        
+        # Create all tables (if they don't exist)
+        db.create_all()
+        # Check if payment_method_id column exists, if not add it
+        try:
+            from sqlalchemy import text, inspect
+            
+            # Check if the column exists
+            inspector = inspect(db.engine)
+            columns = inspector.get_columns('order')  # Change to 'order' to match the actual table name
+            column_names = [col['name'] for col in columns]
+            
+            if 'payment_method_id' not in column_names:
+                print("Adding payment_method_id column to order table...")
+                
+                # Add the column
+                db.engine.execute(text('ALTER TABLE "order" ADD COLUMN payment_method_id INTEGER'))
+                
+                # Add foreign key constraint
+                db.engine.execute(text('ALTER TABLE "order" ADD CONSTRAINT fk_order_payment_method FOREIGN KEY (payment_method_id) REFERENCES payment_method(id)'))
+                
+                print("payment_method_id column added successfully!")
+            else:
+                print("payment_method_id column already exists")
+                
+        except Exception as e:
+            print(f"Error checking/adding column: {e}")
+Run This Code
+Make sure to run this code in your Replit shell to ensure the column is added correctly. If successful, it should print "payment_method_id column added successfully!" and the error should not persist.
+
+If the column already exists, check your database setup to ensure everything is synced with your application. If using Postgres, sometimes the schema might need to be refreshed, or you might need to check your database directly using a tool like pgAdmin or psql.
+
+Also, if you're using migrations, consider running flask db migrate and flask db upgrade again to ensure all changes are applied to your database.
+
+Let me know if you need further help!
+
+Why does it affects my admin and can you fix it
+
+ID
+
+sj3015849
+Assistant
+1 minute ago
+The issue affecting your admin routes and causing the error column order.payment_method_id does not exist is likely due to the absence of the payment_method_id column in your order table that is referenced in your database queries.
+
+The problem stems from the fact that your application expects this column to exist for proper functionality, especially when it comes to processing payments. When a user accesses admin-related routes that rely on the order table, the absence of this column can lead to errors.
+
+Here's what you need to do to fix the issue:
+
+Step 1: Update Your Database Schema
+You should add the payment_method_id column to your order table if it doesn't already exist. You can execute the following code snippet to check and add the column:
+
+from app import app, db
+from sqlalchemy import text, inspect
+if __name__ == '__main__':
+    with app.app_context():
+        inspector = inspect(db.engine)
+        columns = inspector.get_columns('order')  # Ensure table name is correct
+        column_names = [col['name'] for col in columns]
+        if 'payment_method_id' not in column_names:
+            print("Adding payment_method_id column to order table...")
+            # Add the column
+            db.engine.execute(text('ALTER TABLE "order" ADD COLUMN payment_method_id INTEGER'))
+            # Add foreign key constraint
+            db.engine.execute(text('ALTER TABLE "order" ADD CONSTRAINT fk_order_payment_method FOREIGN KEY (payment_method_id) REFERENCES payment_method(id)'))
+            print("payment_method_id column added successfully!")
+        else:
+            print("payment_method_id column already exists")
+Step 2: Run Your Application
+After making these changes, run your application again. This should prevent the errors related to the payment_method_id column. Ensure that you start your Flask app with:
+
+app.run(host='0.0.0.0', port=5000, debug=True)
+Additional Steps
+If you are using migrations, you can also create a migration file to add this column properly, if you haven't done so already. Run the following commands:
+
+flask db migrate -m "Add payment_method_id to order table"
+flask db upgrade
