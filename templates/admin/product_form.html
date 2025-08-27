@@ -1,0 +1,196 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.products') }}">Products</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    {{ form.name.label(class="form-label") }}
+                                    {{ form.name(class="form-control") }}
+                                    {% if form.name.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.description.label(class="form-label") }}
+                                    {{ form.description(class="form-control", rows="4") }}
+                                    {% if form.description.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.description.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.price.label(class="form-label") }}
+                                        <div class="input-group">
+                                            <span class="input-group-text">₦</span>
+                                            {{ form.price(class="form-control") }}
+                                        </div>
+                                        {% if form.price.errors %}
+                                            <div class="text-danger small">
+                                                {% for error in form.price.errors %}
+                                                    <div>{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.original_price.label(class="form-label") }}
+                                        <div class="input-group">
+                                            <span class="input-group-text">₦</span>
+                                            {{ form.original_price(class="form-control") }}
+                                        </div>
+                                        <small class="text-muted">Leave blank if no discount</small>
+                                        {% if form.original_price.errors %}
+                                            <div class="text-danger small">
+                                                {% for error in form.original_price.errors %}
+                                                    <div>{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.image_url.label(class="form-label") }}
+                                    {{ form.image_url(class="form-control") }}
+                                    <small class="text-muted">Enter image URL or upload image</small>
+                                    {% if form.image_url.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.image_url.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form.category.label(class="form-label") }}
+                                    {{ form.category(class="form-select") }}
+                                    {% if form.category.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.category.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.stock_quantity.label(class="form-label") }}
+                                    {{ form.stock_quantity(class="form-control") }}
+                                    {% if form.stock_quantity.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.stock_quantity.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.is_active(class="form-check-input") }}
+                                        {{ form.is_active.label(class="form-check-label") }}
+                                    </div>
+                                    {% if form.is_active.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.is_active.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Image Preview -->
+                                {% if product and product.image_url %}
+                                <div class="mb-3">
+                                    <label class="form-label">Current Image</label>
+                                    <div class="border rounded p-2">
+                                        <img src="{{ product.image_url }}" alt="{{ product.name }}" 
+                                             class="img-fluid rounded" style="max-height: 150px;">
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> 
+                                {% if product %}Update Product{% else %}Create Product{% endif %}
+                            </button>
+                            <a href="{{ url_for('admin.products') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Image URL preview
+document.addEventListener('DOMContentLoaded', function() {
+    const imageUrlInput = document.getElementById('image_url');
+    
+    // Create preview element
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'mt-2';
+    previewDiv.innerHTML = '<img id="imagePreview" class="img-fluid rounded border" style="max-height: 150px; display: none;">';
+    imageUrlInput.parentNode.appendChild(previewDiv);
+    
+    const imagePreview = document.getElementById('imagePreview');
+    
+    imageUrlInput.addEventListener('input', function() {
+        const url = this.value.trim();
+        if (url) {
+            imagePreview.src = url;
+            imagePreview.style.display = 'block';
+            imagePreview.onerror = function() {
+                this.style.display = 'none';
+            };
+        } else {
+            imagePreview.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

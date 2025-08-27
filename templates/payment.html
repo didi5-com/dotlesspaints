@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Payment - Doctless Paint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">Complete Your Payment</h2>
+                <p class="text-muted">Secure payment powered by Paystack</p>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-3">Order Summary</h5>
+                            <div class="order-summary">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Order #{{ order.id }}</span>
+                                    <span class="fw-bold">₦{{ "{:,.0f}".format(order.total_amount) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Shipping</span>
+                                    <span class="text-success">Free</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <strong>Total</strong>
+                                    <strong class="text-primary fs-4">₦{{ "{:,.0f}".format(order.total_amount) }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="shipping-info">
+                                <h6 class="fw-bold">Shipping Details</h6>
+                                <p class="text-muted mb-1">{{ current_user.first_name }} {{ current_user.last_name }}</p>
+                                <p class="text-muted mb-1">{{ order.phone }}</p>
+                                <p class="text-muted">{{ order.shipping_address }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-3">Payment Method</h5>
+                            <div class="payment-section">
+                                <div class="d-grid">
+                                    <button id="paystack-btn" class="btn btn-success btn-lg">
+                                        <i class="fas fa-credit-card"></i>
+                                        Pay ₦{{ "{:,.0f}".format(order.total_amount) }}
+                                    </button>
+                                </div>
+
+                                <div class="payment-methods mt-3">
+                                    <small class="text-muted">Accepted payment methods:</small>
+                                    <div class="payment-icons mt-2">
+                                        <i class="fab fa-cc-visa fa-2x text-primary me-2"></i>
+                                        <i class="fab fa-cc-mastercard fa-2x text-warning me-2"></i>
+                                        <i class="fas fa-university fa-2x text-info me-2"></i>
+                                        <i class="fas fa-mobile-alt fa-2x text-success"></i>
+                                    </div>
+                                </div>
+
+                                <div class="security-info mt-4">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-lock text-success me-2"></i>
+                                        <small class="text-muted">Your payment information is secure and encrypted</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('main.cart') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Cart
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+document.getElementById('paystack-btn').addEventListener('click', function() {
+    let handler = PaystackPop.setup({
+        key: '{{ paystack_public_key }}',
+        email: '{{ current_user.email }}',
+        amount: {{ order.total_amount * 100 }}, // Amount in kobo
+        currency: 'NGN',
+        ref: 'order_{{ order.id }}_' + Math.floor((Math.random() * 1000000000) + 1),
+        callback: function(response) {
+            // Redirect to verification page
+            window.location.href = "{{ url_for('main.verify_payment', order_id=order.id) }}?reference=" + response.reference;
+        },
+        onClose: function() {
+            alert('Payment cancelled');
+        }
+    });
+    handler.openIframe();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Doctless Paint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="profile-header text-center mb-5">
+                <div class="profile-avatar mx-auto mb-3">
+                    <i class="fas fa-user-circle fa-5x text-primary"></i>
+                </div>
+                <h2 class="fw-bold">{{ user.first_name }} {{ user.last_name }}</h2>
+                <p class="text-muted">@{{ user.username }}</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Profile Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                {{ form.hidden_tag() }}
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.first_name.label(class="form-label") }}
+                                        {{ form.first_name(class="form-control") }}
+                                        {% if form.first_name.errors %}
+                                            <div class="text-danger small">
+                                                {% for error in form.first_name.errors %}
+                                                    <div>{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.last_name.label(class="form-label") }}
+                                        {{ form.last_name(class="form-control") }}
+                                        {% if form.last_name.errors %}
+                                            <div class="text-danger small">
+                                                {% for error in form.last_name.errors %}
+                                                    <div>{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.username.label(class="form-label") }}
+                                    {{ form.username(class="form-control") }}
+                                    {% if form.username.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.username.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                                    <small class="text-muted">Email cannot be changed</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.phone.label(class="form-label") }}
+                                    {{ form.phone(class="form-control") }}
+                                    {% if form.phone.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.phone.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.address.label(class="form-label") }}
+                                    {{ form.address(class="form-control", rows="3") }}
+                                    {% if form.address.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.address.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Account Stats</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-item d-flex justify-content-between align-items-center mb-3">
+                                <span><i class="fas fa-calendar-alt text-muted"></i> Member since</span>
+                                <span class="fw-bold">{{ user.created_at.strftime('%b %Y') }}</span>
+                            </div>
+                            <div class="stat-item d-flex justify-content-between align-items-center mb-3">
+                                <span><i class="fas fa-shopping-bag text-muted"></i> Total orders</span>
+                                <span class="fw-bold">{{ user.orders|length }}</span>
+                            </div>
+                            <div class="stat-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-shopping-cart text-muted"></i> Cart items</span>
+                                <span class="fw-bold">{{ user.cart_items|length }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Quick Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('main.orders') }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-list"></i> View Orders
+                                </a>
+                                <a href="{{ url_for('main.cart') }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-shopping-cart"></i> View Cart
+                                </a>
+                                <a href="{{ url_for('main.products') }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-paint-brush"></i> Shop Products
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

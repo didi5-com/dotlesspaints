@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - Doctless Paint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="fw-bold mb-4">
+                <i class="fas fa-box text-primary"></i>
+                My Orders
+            </h2>
+        </div>
+    </div>
+
+    {% if orders.items %}
+    <div class="row">
+        {% for order in orders.items %}
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <div class="order-id">
+                                <small class="text-muted">Order ID</small>
+                                <div class="fw-bold">#{{ order.id }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="order-date">
+                                <small class="text-muted">Date</small>
+                                <div>{{ order.created_at.strftime('%b %d, %Y') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="order-total">
+                                <small class="text-muted">Total</small>
+                                <div class="fw-bold text-primary">₦{{ "{:,.0f}".format(order.total_amount) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="order-status">
+                                <small class="text-muted">Status</small>
+                                <div>
+                                    <span class="badge bg-{% if order.status == 'pending' %}warning{% elif order.status == 'confirmed' %}info{% elif order.status == 'shipped' %}primary{% elif order.status == 'delivered' %}success{% else %}danger{% endif %}">
+                                        {{ order.status.title() }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="payment-status">
+                                <small class="text-muted">Payment</small>
+                                <div>
+                                    <span class="badge bg-{% if order.payment_status == 'paid' %}success{% elif order.payment_status == 'pending' %}warning{% else %}danger{% endif %}">
+                                        {{ order.payment_status.title() }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <div class="order-actions">
+                                <a href="{{ url_for('main.order_detail', order_id=order.id) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                                {% if order.payment_status == 'pending' %}
+                                <a href="{{ url_for('main.payment', order_id=order.id) }}" class="btn btn-primary btn-sm mt-1">
+                                    <i class="fas fa-credit-card"></i> Pay Now
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items Preview -->
+                    {% if order.order_items %}
+                    <div class="order-items-preview mt-3 pt-3 border-top">
+                        <div class="row">
+                            {% for item in order.order_items[:3] %}
+                            <div class="col-auto">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item.product.image_url or 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&q=80' }}" 
+                                         alt="{{ item.product.name }}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div>
+                                        <small class="fw-bold">{{ item.product.name }}</small>
+                                        <br>
+                                        <small class="text-muted">Qty: {{ item.quantity }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% if order.order_items|length > 3 %}
+                            <div class="col-auto">
+                                <small class="text-muted">+{{ order.order_items|length - 3 }} more items</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if orders.pages > 1 %}
+    <nav aria-label="Orders pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if orders.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('main.orders', page=orders.prev_num) }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in orders.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != orders.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.orders', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">…</span>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if orders.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('main.orders', page=orders.next_num) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-box fa-5x text-muted mb-3"></i>
+        <h3>No orders found</h3>
+        <p class="text-muted mb-4">You haven't placed any orders yet.</p>
+        <a href="{{ url_for('main.products') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-paint-brush"></i> Start Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

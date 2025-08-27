@@ -1,0 +1,237 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Users Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">Users Management</h4>
+    </div>
+
+    <!-- Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Search Users</label>
+                    <input type="text" class="form-control" name="search" value="{{ search or '' }}" 
+                           placeholder="Search by name, email, or username...">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-body">
+            {% if users.items %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Contact</th>
+                            <th>Registration</th>
+                            <th>Orders</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users.items %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-3">
+                                        {% if user.google_id %}
+                                        <i class="fab fa-google fa-2x text-danger"></i>
+                                        {% else %}
+                                        <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ user.first_name }} {{ user.last_name }}</div>
+                                        <small class="text-muted">@{{ user.username }}</small>
+                                        {% if user.is_admin %}
+                                        <span class="badge bg-danger ms-1">Admin</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>{{ user.email }}</div>
+                                {% if user.phone %}
+                                <small class="text-muted">{{ user.phone }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>{{ user.created_at.strftime('%b %d, %Y') }}</div>
+                                <small class="text-muted">{{ user.created_at.strftime('%I:%M %p') }}</small>
+                                {% if user.google_id %}
+                                <div class="mt-1">
+                                    <span class="badge bg-info">Google Auth</span>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="text-center">
+                                    <span class="badge bg-primary fs-6">{{ user.orders|length }}</span>
+                                    {% if user.orders %}
+                                    <div class="small text-muted mt-1">
+                                        Last: {{ user.orders[0].created_at.strftime('%b %d') }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">Active</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-info" data-bs-toggle="modal" 
+                                            data-bs-target="#userDetailsModal" 
+                                            data-user-id="{{ user.id }}"
+                                            data-user-name="{{ user.first_name }} {{ user.last_name }}"
+                                            data-user-email="{{ user.email }}"
+                                            data-user-phone="{{ user.phone or '' }}"
+                                            data-user-address="{{ user.address or '' }}"
+                                            data-user-joined="{{ user.created_at.strftime('%B %d, %Y') }}"
+                                            data-user-orders="{{ user.orders|length }}"
+                                            title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="mailto:{{ user.email }}" class="btn btn-outline-primary" title="Email User">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if users.pages > 1 %}
+            <nav aria-label="Users pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if users.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.users', page=users.prev_num, search=search) }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in users.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != users.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.users', page=page_num, search=search) }}">{{ page_num }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if users.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.users', page=users.next_num, search=search) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                <h5>No users found</h5>
+                <p class="text-muted">No users match your search criteria</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3">Personal Information</h6>
+                        <div class="mb-2">
+                            <strong>Full Name:</strong> <span id="modalUserName"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Email:</strong> <span id="modalUserEmail"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Phone:</strong> <span id="modalUserPhone"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Address:</strong> <span id="modalUserAddress"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3">Account Information</h6>
+                        <div class="mb-2">
+                            <strong>Joined:</strong> <span id="modalUserJoined"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Total Orders:</strong> <span id="modalUserOrders" class="badge bg-primary"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" id="modalEmailButton" class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Send Email
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// User details modal functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const userDetailsModal = document.getElementById('userDetailsModal');
+    
+    userDetailsModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        
+        document.getElementById('modalUserName').textContent = button.getAttribute('data-user-name');
+        document.getElementById('modalUserEmail').textContent = button.getAttribute('data-user-email');
+        document.getElementById('modalUserPhone').textContent = button.getAttribute('data-user-phone') || 'Not provided';
+        document.getElementById('modalUserAddress').textContent = button.getAttribute('data-user-address') || 'Not provided';
+        document.getElementById('modalUserJoined').textContent = button.getAttribute('data-user-joined');
+        document.getElementById('modalUserOrders').textContent = button.getAttribute('data-user-orders');
+        
+        const emailButton = document.getElementById('modalEmailButton');
+        emailButton.href = 'mailto:' + button.getAttribute('data-user-email');
+    });
+});
+</script>
+{% endblock %}

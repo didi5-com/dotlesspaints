@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Doctless Paint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold">Contact Us</h1>
+                <p class="lead text-muted">We'd love to hear from you. Get in touch with our team.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold mb-4">Send us a Message</h5>
+                            <form method="POST">
+                                {{ form.hidden_tag() }}
+                                
+                                <div class="mb-3">
+                                    {{ form.name.label(class="form-label") }}
+                                    {{ form.name(class="form-control") }}
+                                    {% if form.name.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.email.label(class="form-label") }}
+                                    {{ form.email(class="form-control") }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.email.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.message.label(class="form-label") }}
+                                    {{ form.message(class="form-control", rows="5") }}
+                                    {% if form.message.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.message.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane"></i> Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="contact-info">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3">Get in Touch</h6>
+                                <div class="contact-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="contact-icon me-3">
+                                            <i class="fas fa-map-marker-alt text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Address</div>
+                                            <small class="text-muted">Warri, Delta State, Nigeria</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="contact-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="contact-icon me-3">
+                                            <i class="fas fa-phone text-success"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Phone</div>
+                                            <small class="text-muted">+234 811 956 3832</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="contact-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="contact-icon me-3">
+                                            <i class="fas fa-envelope text-info"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Email</div>
+                                            <small class="text-muted">info@doctlesspaint.com</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="contact-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="contact-icon me-3">
+                                            <i class="fas fa-clock text-warning"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Business Hours</div>
+                                            <small class="text-muted">Mon - Sat: 8AM - 6PM</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow">
+                            <div class="card-body text-center">
+                                <h6 class="fw-bold mb-3">Follow Us</h6>
+                                <div class="social-links">
+                                    <a href="#" class="btn btn-outline-primary btn-sm me-2">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-outline-info btn-sm me-2">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-outline-danger btn-sm me-2">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                    <a href="https://wa.me/2348119563832" class="btn btn-outline-success btn-sm">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

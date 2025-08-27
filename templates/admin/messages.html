@@ -1,0 +1,182 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Contact Messages{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">Contact Messages</h4>
+    </div>
+
+    <!-- Messages List -->
+    <div class="card">
+        <div class="card-body">
+            {% if messages.items %}
+            <div class="messages-list">
+                {% for message in messages.items %}
+                <div class="message-item {% if not message.is_read %}bg-light{% endif %} p-3 mb-3 rounded border">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="message-header d-flex align-items-center mb-2">
+                                <div class="message-status me-2">
+                                    {% if not message.is_read %}
+                                    <i class="fas fa-circle text-primary" style="font-size: 0.5rem;" title="Unread"></i>
+                                    {% else %}
+                                    <i class="fas fa-check-circle text-success" title="Read"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="message-from">
+                                    <strong>{{ message.name }}</strong>
+                                    <span class="text-muted">{{ message.email }}</span>
+                                </div>
+                                <div class="message-date ms-auto">
+                                    <small class="text-muted">{{ message.created_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                                </div>
+                            </div>
+                            <div class="message-content">
+                                <p class="mb-0">{{ message.message }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="message-actions">
+                                {% if not message.is_read %}
+                                <a href="{{ url_for('admin.mark_message_read', message_id=message.id) }}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-check"></i> Mark as Read
+                                </a>
+                                {% endif %}
+                                <a href="mailto:{{ message.email }}?subject=Re: Your inquiry&body=Hi {{ message.name }},%0D%0A%0D%0AThank you for contacting Doctless Paint.%0D%0A%0D%0A" 
+                                   class="btn btn-primary btn-sm">
+                                    <i class="fas fa-reply"></i> Reply
+                                </a>
+                                <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" 
+                                        data-bs-target="#messageModal" 
+                                        data-message-name="{{ message.name }}"
+                                        data-message-email="{{ message.email }}"
+                                        data-message-date="{{ message.created_at.strftime('%B %d, %Y at %I:%M %p') }}"
+                                        data-message-content="{{ message.message }}">
+                                    <i class="fas fa-expand"></i> View Full
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if messages.pages > 1 %}
+            <nav aria-label="Messages pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if messages.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.messages', page=messages.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in messages.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != messages.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.messages', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if messages.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.messages', page=messages.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-envelope fa-4x text-muted mb-3"></i>
+                <h5>No messages yet</h5>
+                <p class="text-muted">Contact messages will appear here when customers reach out</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Message Detail Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Message Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="message-details">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>From:</strong> <span id="modalMessageName"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Email:</strong> <span id="modalMessageEmail"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Date:</strong> <span id="modalMessageDate"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Message:</strong>
+                            <div class="mt-2 p-3 bg-light rounded">
+                                <p id="modalMessageContent" class="mb-0"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" id="modalReplyButton" class="btn btn-primary">
+                    <i class="fas fa-reply"></i> Reply
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Message modal functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const messageModal = document.getElementById('messageModal');
+    
+    messageModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        
+        const name = button.getAttribute('data-message-name');
+        const email = button.getAttribute('data-message-email');
+        const date = button.getAttribute('data-message-date');
+        const content = button.getAttribute('data-message-content');
+        
+        document.getElementById('modalMessageName').textContent = name;
+        document.getElementById('modalMessageEmail').textContent = email;
+        document.getElementById('modalMessageDate').textContent = date;
+        document.getElementById('modalMessageContent').textContent = content;
+        
+        const replyButton = document.getElementById('modalReplyButton');
+        replyButton.href = `mailto:${email}?subject=Re: Your inquiry&body=Hi ${name},%0D%0A%0D%0AThank you for contacting Doctless Paint.%0D%0A%0D%0A`;
+    });
+});
+</script>
+{% endblock %}

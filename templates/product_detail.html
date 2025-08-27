@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Doctless Paint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.products') }}">Products</a></li>
+            {% if product.category %}
+            <li class="breadcrumb-item"><a href="{{ url_for('main.products', category=product.category) }}">{{ product.category.title() }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="product-image-container">
+                <img src="{{ product.image_url or 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" 
+                     alt="{{ product.name }}" class="img-fluid rounded shadow-sm main-product-image">
+                {% if product.original_price and product.original_price > product.price %}
+                <div class="discount-badge-large">
+                    -{{ ((product.original_price - product.price) / product.original_price * 100) | round | int }}% OFF
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="product-info">
+                {% if product.category %}
+                <div class="product-category">
+                    <span class="badge bg-secondary mb-2">{{ product.category.title() }}</span>
+                </div>
+                {% endif %}
+                
+                <h1 class="product-title fw-bold mb-3">{{ product.name }}</h1>
+                
+                <div class="price-section mb-4">
+                    <div class="current-price">
+                        <span class="h2 text-primary fw-bold">₦{{ "{:,.0f}".format(product.price) }}</span>
+                        {% if product.original_price and product.original_price > product.price %}
+                        <span class="original-price h5 text-muted text-decoration-line-through ms-2">₦{{ "{:,.0f}".format(product.original_price) }}</span>
+                        <span class="savings text-success ms-2">
+                            Save ₦{{ "{:,.0f}".format(product.original_price - product.price) }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="stock-info mb-4">
+                    {% if product.stock_quantity > 0 %}
+                        {% if product.stock_quantity <= 5 %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Only {{ product.stock_quantity }} left in stock!</strong>
+                        </div>
+                        {% else %}
+                        <p class="text-success">
+                            <i class="fas fa-check-circle"></i>
+                            {{ product.stock_quantity }} items in stock
+                        </p>
+                        {% endif %}
+                    {% else %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-times-circle"></i>
+                        <strong>Out of Stock</strong>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if product.description %}
+                <div class="product-description mb-4">
+                    <h5 class="fw-bold">Description</h5>
+                    <p class="text-muted">{{ product.description }}</p>
+                </div>
+                {% endif %}
+
+                {% if product.stock_quantity > 0 %}
+                <form method="POST" action="{{ url_for('main.add_to_cart', product_id=product.id) }}" class="add-to-cart-form">
+                    <div class="row align-items-end mb-3">
+                        <div class="col-md-4">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock_quantity }}" 
+                                   class="form-control form-control-lg">
+                        </div>
+                    </div>
+                    
+                    {% if current_user.is_authenticated %}
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary btn-lg flex-fill">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-lg" onclick="buyNow()">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="d-grid">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Login to Purchase
+                        </a>
+                    </div>
+                    {% endif %}
+                </form>
+                {% else %}
+                <div class="d-grid">
+                    <button class="btn btn-secondary btn-lg" disabled>
+                        <i class="fas fa-times"></i> Out of Stock
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Product Features -->
+                <div class="product-features mt-4">
+                    <h6 class="fw-bold mb-3">Product Features</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="feature-item mb-2">
+                                <i class="fas fa-shield-alt text-success"></i>
+                                <small class="ms-2">Premium Quality</small>
+                            </div>
+                            <div class="feature-item mb-2">
+                                <i class="fas fa-leaf text-success"></i>
+                                <small class="ms-2">Eco-Friendly</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="feature-item mb-2">
+                                <i class="fas fa-shipping-fast text-primary"></i>
+                                <small class="ms-2">Fast Delivery</small>
+                            </div>
+                            <div class="feature-item mb-2">
+                                <i class="fas fa-undo text-info"></i>
+                                <small class="ms-2">Easy Returns</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <section class="related-products mt-5">
+        <h3 class="fw-bold mb-4">Related Products</h3>
+        <div class="row">
+            {% for related_product in related_products %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="product-card h-100 shadow-sm">
+                    <div class="product-image">
+                        <a href="{{ url_for('main.product_detail', product_id=related_product.id) }}">
+                            <img src="{{ related_product.image_url or 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }}" 
+                                 alt="{{ related_product.name }}" class="card-img-top">
+                        </a>
+                        {% if related_product.original_price and related_product.original_price > related_product.price %}
+                        <div class="discount-badge">
+                            -{{ ((related_product.original_price - related_product.price) / related_product.original_price * 100) | round | int }}%
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <a href="{{ url_for('main.product_detail', product_id=related_product.id) }}" class="text-decoration-none">
+                                {{ related_product.name }}
+                            </a>
+                        </h6>
+                        <div class="price">
+                            <span class="current-price fw-bold text-primary">₦{{ "{:,.0f}".format(related_product.price) }}</span>
+                            {% if related_product.original_price and related_product.original_price > related_product.price %}
+                            <span class="original-price text-muted text-decoration-line-through ms-1 small">₦{{ "{:,.0f}".format(related_product.original_price) }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function buyNow() {
+    const form = document.querySelector('.add-to-cart-form');
+    const formData = new FormData(form);
+    
+    // Submit form and then redirect to checkout
+    fetch(form.action, {
+        method: 'POST',
+        body: formData
+    }).then(() => {
+        window.location.href = "{{ url_for('main.checkout') }}";
+    });
+}
+
+// Quantity input validation
+document.addEventListener('DOMContentLoaded', function() {
+    const quantityInput = document.getElementById('quantity');
+    const maxStock = {{ product.stock_quantity }};
+    
+    quantityInput.addEventListener('input', function() {
+        if (this.value > maxStock) {
+            this.value = maxStock;
+        }
+        if (this.value < 1) {
+            this.value = 1;
+        }
+    });
+});
+</script>
+{% endblock %}
