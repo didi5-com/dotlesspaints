@@ -331,20 +331,84 @@ function initSearchFunctionality() {
     });
 }
 
-// Payment method selection
-document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-        // Hide all payment details
-        document.querySelectorAll('.payment-details').forEach(detail => {
-            detail.style.display = 'none';
-        });
+// Payment method selection functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+    const paymentDetails = document.querySelectorAll('.payment-details');
 
-        // Show selected payment method details
-        const selectedDetails = document.querySelector(`.payment-details[data-payment-method="${this.value}"]`);
-        if (selectedDetails) {
-            selectedDetails.style.display = 'block';
+    if (paymentRadios.length > 0) {
+        paymentRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Hide all payment details
+                paymentDetails.forEach(detail => {
+                    detail.style.display = 'none';
+                });
+
+                // Show selected payment method details
+                if (this.value) {
+                    const selectedDetail = document.querySelector(`.payment-details[data-payment-method="${this.value}"]`);
+                    if (selectedDetail) {
+                        selectedDetail.style.display = 'block';
+                    }
+                }
+            });
+        });
+    }
+
+    // Manual payment confirmation
+    window.confirmManualPayment = function(orderId) {
+        if (confirm('Have you completed the bank transfer?')) {
+            fetch(`/confirm-manual-payment/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Payment confirmation submitted! We will verify and update your order status.');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error confirming payment');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error confirming payment');
+            });
         }
-    });
+    };
+
+    // Crypto payment confirmation
+    window.confirmCryptoPayment = function(orderId) {
+        const txHash = prompt('Please enter the transaction hash:');
+        if (txHash && txHash.trim()) {
+            fetch(`/confirm-crypto-payment/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    transaction_hash: txHash.trim()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Crypto payment confirmation submitted! We will verify and update your order status.');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error confirming payment');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error confirming payment');
+            });
+        }
+    };
 });
 
 // Paystack payment integration
