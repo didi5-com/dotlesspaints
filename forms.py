@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, TextAreaField, FloatField, IntegerField, BooleanField, SelectField, PasswordField, SubmitField, HiddenField
 from wtforms.validators import DataRequired, Email, Length, NumberRange, Optional, EqualTo
 from wtforms.widgets import TextArea
@@ -34,6 +35,7 @@ class ProductForm(FlaskForm):
     price = FloatField('Price (NGN)', validators=[DataRequired(), NumberRange(min=0)])
     original_price = FloatField('Original Price (NGN)', validators=[NumberRange(min=0)])
     image_url = StringField('Image URL', validators=[Length(max=200)])
+    image_file = FileField('Upload Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif', 'webp'], 'Images only!')])
     category = SelectField('Category', choices=[
         ('paints', 'Paints'),
         ('brushes', 'Brushes'),

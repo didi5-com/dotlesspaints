@@ -4,6 +4,7 @@ from functools import wraps
 from app import db
 from models import User, Product, Order, ContactMessage, SiteCustomization, PaymentMethod
 from forms import ProductForm, SiteCustomizationForm, PaymentMethodForm
+from utils import save_picture
 import json
 
 admin_bp = Blueprint('admin', __name__)
@@ -112,12 +113,19 @@ def add_product():
     form = ProductForm()
     
     if form.validate_on_submit():
+        image_url = form.image_url.data
+        
+        # Handle image upload
+        if form.image_file.data:
+            image_filename = save_picture(form.image_file.data, 'images/products')
+            image_url = f'/static/images/products/{image_filename}'
+        
         product = Product(
             name=form.name.data,
             description=form.description.data,
             price=form.price.data,
             original_price=form.original_price.data,
-            image_url=form.image_url.data,
+            image_url=image_url,
             category=form.category.data,
             stock_quantity=form.stock_quantity.data,
             is_active=form.is_active.data
@@ -138,11 +146,18 @@ def edit_product(product_id):
     form = ProductForm(obj=product)
     
     if form.validate_on_submit():
+        image_url = form.image_url.data
+        
+        # Handle image upload
+        if form.image_file.data:
+            image_filename = save_picture(form.image_file.data, 'images/products')
+            image_url = f'/static/images/products/{image_filename}'
+        
         product.name = form.name.data
         product.description = form.description.data
         product.price = form.price.data
         product.original_price = form.original_price.data
-        product.image_url = form.image_url.data
+        product.image_url = image_url
         product.category = form.category.data
         product.stock_quantity = form.stock_quantity.data
         product.is_active = form.is_active.data

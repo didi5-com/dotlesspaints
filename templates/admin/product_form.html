@@ -19,7 +19,7 @@
                     <h5 class="mb-0">{{ title }}</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         {{ form.hidden_tag() }}
                         
                         <div class="row">
@@ -84,10 +84,23 @@
                                 <div class="mb-3">
                                     {{ form.image_url.label(class="form-label") }}
                                     {{ form.image_url(class="form-control") }}
-                                    <small class="text-muted">Enter image URL or upload image</small>
+                                    <small class="text-muted">Enter image URL</small>
                                     {% if form.image_url.errors %}
                                         <div class="text-danger small">
                                             {% for error in form.image_url.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.image_file.label(class="form-label") }}
+                                    {{ form.image_file(class="form-control") }}
+                                    <small class="text-muted">Or upload image file (JPG, PNG, GIF, WebP)</small>
+                                    {% if form.image_file.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.image_file.errors %}
                                                 <div>{{ error }}</div>
                                             {% endfor %}
                                         </div>
