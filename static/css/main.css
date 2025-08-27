@@ -2,25 +2,36 @@
 
 /* Color Variables */
 :root {
-    --primary: #667EEA;
-    --secondary: #764BA2;
-    --accent: #F093FB;
-    --background: #FAFAFB;
-    --text: #1A202C;
-    --success: #48BB78;
-    --warning: #ED8936;
-    --danger: #F56565;
-    --light: #F7FAFC;
-    --dark: #2D3748;
-    --spacing: 20px;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary: #64748b;
+    --success: #059669;
+    --danger: #dc2626;
+    --warning: #d97706;
+    --info: #0891b2;
+    --light: #f8fafc;
+    --dark: #0f172a;
+    --text: #334155;
+    --text-light: #64748b;
+    --spacing: 1.5rem;
+    --border-radius: 0.75rem;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--background);
-    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
+    color: var(--text);
+    background-color: #ffffff;
+    font-size: 16px;
 }
 
 .bg-primary {
@@ -37,7 +48,7 @@ body {
 
 /* Navigation */
 .navbar {
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow);
     transition: all 0.3s ease;
 }
 
@@ -61,7 +72,7 @@ body {
 
 /* Buttons */
 .btn {
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     font-weight: 500;
     padding: 10px var(--spacing);
     transition: all 0.3s ease;
@@ -93,22 +104,60 @@ body {
 /* Cards */
 .card {
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
     transition: all 0.3s ease;
     margin-bottom: var(--spacing);
 }
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-lg);
 }
 
 /* Product Cards */
 .product-card {
+    background: white;
+    border-radius: var(--border-radius);
     overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e2e8f0;
     position: relative;
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.product-card .card-img-top {
+    height: 280px;
+    object-fit: cover;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.02);
+}
+
+.product-card .card-body {
+    padding: 1.25rem;
+}
+
+.product-card .card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.product-card .card-text {
+    color: var(--text-light);
+    font-size: 0.875rem;
+    line-height: 1.5;
 }
 
 .product-image {
@@ -184,7 +233,7 @@ body {
 /* Feature Cards */
 .feature-card {
     background: white;
-    border-radius: 15px;
+    border-radius: var(--border-radius);
     padding: var(--spacing);
     transition: all 0.3s ease;
     border: 1px solid rgba(0,0,0,0.05);
@@ -192,7 +241,7 @@ body {
 
 .feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-lg);
 }
 
 .feature-icon {
@@ -330,7 +379,7 @@ body {
 
 /* Product Detail */
 .main-product-image {
-    border-radius: 15px;
+    border-radius: var(--border-radius);
     max-height: 400px;
     object-fit: cover;
 }
@@ -351,7 +400,7 @@ body {
 .price-section {
     background: var(--light);
     padding: var(--spacing);
-    border-radius: 15px;
+    border-radius: var(--border-radius);
 }
 
 .savings {
@@ -367,7 +416,7 @@ body {
 /* Alerts */
 .alert {
     border: none;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     padding: 15px var(--spacing);
 }
 
@@ -392,7 +441,7 @@ body {
 /* Form Styles */
 .form-control,
 .form-select {
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     border: 2px solid #e2e8f0;
     padding: 12px 15px;
     transition: all 0.3s ease;
@@ -416,7 +465,7 @@ body {
 }
 
 .page-link {
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     margin: 0 2px;
     border: 2px solid #e2e8f0;
     color: var(--primary);
@@ -478,22 +527,22 @@ footer {
         min-height: 50vh;
         text-align: center;
     }
-    
+
     .product-info {
         padding-left: 0;
         padding-top: var(--spacing);
     }
-    
+
     .whatsapp-float {
         width: 50px;
         height: 50px;
         font-size: 20px;
     }
-    
+
     .cart-item-row {
         padding: 10px;
     }
-    
+
     .feature-card {
         margin-bottom: var(--spacing);
     }
@@ -512,11 +561,11 @@ html {
 
 /* Utility Classes */
 .shadow-sm {
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    box-shadow: var(--shadow) !important;
 }
 
 .shadow {
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
+    box-shadow: var(--shadow-lg) !important;
 }
 
 .shadow-lg {
@@ -524,7 +573,7 @@ html {
 }
 
 .rounded-lg {
-    border-radius: 15px !important;
+    border-radius: var(--border-radius) !important;
 }
 
 .text-muted {
@@ -586,6 +635,6 @@ html {
 /* Filters */
 .filters-section {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
 }

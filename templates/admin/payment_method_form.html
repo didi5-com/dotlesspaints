@@ -1,0 +1,105 @@
+
+{% extends "admin/base.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.payment_methods') }}">Payment Methods</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.name.label(class="form-label") }}
+                                {{ form.name(class="form-control") }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.name.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form.method_type.label(class="form-label") }}
+                                {{ form.method_type(class="form-select") }}
+                                {% if form.method_type.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.method_type.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.configuration.label(class="form-label") }}
+                            {{ form.configuration(class="form-control", rows="4") }}
+                            <small class="text-muted">
+                                Configuration in JSON format. Examples:<br>
+                                <strong>Bank Transfer:</strong> {"account_number": "1234567890", "account_name": "Doctless Paint", "bank_name": "First Bank"}<br>
+                                <strong>Crypto:</strong> {"wallet_address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", "currency": "BTC"}
+                            </small>
+                            {% if form.configuration.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.configuration.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.instructions.label(class="form-label") }}
+                            {{ form.instructions(class="form-control", rows="5") }}
+                            <small class="text-muted">Instructions shown to customers for this payment method</small>
+                            {% if form.instructions.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.instructions.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_active(class="form-check-input") }}
+                                {{ form.is_active.label(class="form-check-label") }}
+                            </div>
+                        </div>
+
+                        <hr>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> 
+                                {% if method %}Update Payment Method{% else %}Create Payment Method{% endif %}
+                            </button>
+                            <a href="{{ url_for('admin.payment_methods') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

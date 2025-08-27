@@ -2,8 +2,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from functools import wraps
 from app import db
-from models import User, Product, Order, ContactMessage
-from forms import ProductForm
+from models import User, Product, Order, ContactMessage, SiteCustomization, PaymentMethod
+from forms import ProductForm, SiteCustomizationForm, PaymentMethodForm
+import json
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -250,3 +251,124 @@ def mark_message_read(message_id):
     message.is_read = True
     db.session.commit()
     return redirect(url_for('admin.messages'))
+
+
+@admin_bp.route('/site-customization')
+@login_required
+@admin_required
+def site_customization():
+    page = request.args.get('page', 1, type=int)
+    customizations = SiteCustomization.query.order_by(
+        SiteCustomization.section, SiteCustomization.position_order
+    ).paginate(page=page, per_page=20, error_out=False)
+    return render_template('admin/site_customization.html', customizations=customizations)
+
+
+@admin_bp.route('/site-customization/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_customization():
+    form = SiteCustomizationForm()
+    if form.validate_on_submit():
+        customization = SiteCustomization(
+            section=form.section.data,
+            element_type=form.element_type.data,
+            element_key=form.element_key.data,
+            content=form.content.data,
+            style_properties=form.style_properties.data,
+            position_order=form.position_order.data,
+            is_active=form.is_active.data
+        )
+        db.session.add(customization)
+        db.session.commit()
+        flash('Site customization added successfully!', 'success')
+        return redirect(url_for('admin.site_customization'))
+    return render_template('admin/customization_form.html', form=form, title='Add Site Customization')
+
+
+@admin_bp.route('/site-customization/edit/<int:customization_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_customization(customization_id):
+    customization = SiteCustomization.query.get_or_404(customization_id)
+    form = SiteCustomizationForm(obj=customization)
+    if form.validate_on_submit():
+        customization.section = form.section.data
+        customization.element_type = form.element_type.data
+        customization.element_key = form.element_key.data
+        customization.content = form.content.data
+        customization.style_properties = form.style_properties.data
+        customization.position_order = form.position_order.data
+        customization.is_active = form.is_active.data
+        db.session.commit()
+        flash('Site customization updated successfully!', 'success')
+        return redirect(url_for('admin.site_customization'))
+    return render_template('admin/customization_form.html', form=form, title='Edit Site Customization', customization=customization)
+
+
+@admin_bp.route('/site-customization/delete/<int:customization_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_customization(customization_id):
+    customization = SiteCustomization.query.get_or_404(customization_id)
+    db.session.delete(customization)
+    db.session.commit()
+    flash('Site customization deleted successfully!', 'success')
+    return redirect(url_for('admin.site_customization'))
+
+
+@admin_bp.route('/payment-methods')
+@login_required
+@admin_required
+def payment_methods():
+    methods = PaymentMethod.query.order_by(PaymentMethod.created_at.desc()).all()
+    return render_template('admin/payment_methods.html', methods=methods)
+
+
+@admin_bp.route('/payment-methods/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_payment_method():
+    form = PaymentMethodForm()
+    if form.validate_on_submit():
+        method = PaymentMethod(
+            name=form.name.data,
+            method_type=form.method_type.data,
+            configuration=form.configuration.data,
+            instructions=form.instructions.data,
+            is_active=form.is_active.data
+        )
+        db.session.add(method)
+        db.session.commit()
+        flash('Payment method added successfully!', 'success')
+        return redirect(url_for('admin.payment_methods'))
+    return render_template('admin/payment_method_form.html', form=form, title='Add Payment Method')
+
+
+@admin_bp.route('/payment-methods/edit/<int:method_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_payment_method(method_id):
+    method = PaymentMethod.query.get_or_404(method_id)
+    form = PaymentMethodForm(obj=method)
+    if form.validate_on_submit():
+        method.name = form.name.data
+        method.method_type = form.method_type.data
+        method.configuration = form.configuration.data
+        method.instructions = form.instructions.data
+        method.is_active = form.is_active.data
+        db.session.commit()
+        flash('Payment method updated successfully!', 'success')
+        return redirect(url_for('admin.payment_methods'))
+    return render_template('admin/payment_method_form.html', form=form, title='Edit Payment Method', method=method)
+
+
+@admin_bp.route('/payment-methods/delete/<int:method_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_payment_method(method_id):
+    method = PaymentMethod.query.get_or_404(method_id)
+    db.session.delete(method)
+    db.session.commit()
+    flash('Payment method deleted successfully!', 'success')
+    return redirect(url_for('admin.payment_methods'))

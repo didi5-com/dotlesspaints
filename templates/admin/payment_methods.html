@@ -1,0 +1,82 @@
+
+{% extends "admin/base.html" %}
+
+{% block page_title %}Payment Methods{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">Payment Methods</h4>
+        <a href="{{ url_for('admin.add_payment_method') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Payment Method
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if methods %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Instructions</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for method in methods %}
+                        <tr>
+                            <td>{{ method.name }}</td>
+                            <td>
+                                <span class="badge bg-{% if method.method_type == 'gateway' %}primary{% elif method.method_type == 'crypto' %}warning{% else %}info{% endif %}">
+                                    {{ method.method_type.title() }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if method.is_active %}success{% else %}secondary{% endif %}">
+                                    {% if method.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if method.instructions %}
+                                    {{ method.instructions[:50] }}{% if method.instructions|length > 50 %}...{% endif %}
+                                {% else %}
+                                    <em class="text-muted">No instructions</em>
+                                {% endif %}
+                            </td>
+                            <td>{{ method.created_at.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('admin.edit_payment_method', method_id=method.id) }}" 
+                                       class="btn btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('admin.delete_payment_method', method_id=method.id) }}" 
+                                          style="display: inline;" onsubmit="return confirm('Are you sure?')">
+                                        <button type="submit" class="btn btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-credit-card fa-4x text-muted mb-3"></i>
+                <h3>No payment methods found</h3>
+                <p class="text-muted">Add payment methods to give customers payment options</p>
+                <a href="{{ url_for('admin.add_payment_method') }}" class="btn btn-primary">Add First Payment Method</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

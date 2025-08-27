@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import login_required, current_user
 from app import db
-from models import Product, CartItem, Order, OrderItem, ContactMessage
+from models import Product, CartItem, Order, OrderItem, ContactMessage, PaymentMethod
 from forms import ContactForm, CheckoutForm
+from utils import get_site_customization, get_site_styles, get_active_payment_methods, format_payment_config
 import requests
 import os
+import json
 
 main_bp = Blueprint('main', __name__)
 
@@ -12,7 +14,14 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     featured_products = Product.query.filter_by(is_active=True).limit(6).all()
-    return render_template('index.html', products=featured_products)
+    
+    # Get site customizations
+    customizations = {
+        'hero': get_site_customization('hero'),
+        'general': get_site_customization('general')
+    }
+    
+    return render_template('index.html', products=featured_products, customizations=customizations)
 
 
 @main_bp.route('/products')
@@ -29,8 +38,8 @@ def products():
     if search:
         query = query.filter(Product.name.contains(search))
     
-    products = query.paginate(page=page, per_page=12, error_out=False)
-    categories = db.session.query(Product.category).filter_by(is_active=True).distinct().all()
+    products = query.order_by(Product.created_at.desc()).paginate(page=page, per_page=12, error_out=False)
+    categories = db.session.query(Product.category).filter(Product.is_active == True).distinct().all()
     categories = [cat[0] for cat in categories if cat[0]]
     
     return render_template('products.html', products=products, categories=categories, 
@@ -138,7 +147,14 @@ def checkout():
     total = sum(item.quantity * product.price for item, product in cart_items)
     form = CheckoutForm()
     
+    # Get available payment methods
+    payment_methods = get_active_payment_methods()
+    form.payment_method.choices = [(str(pm.id), pm.name) for pm in payment_methods]
+    
     if form.validate_on_submit():
+        # Get selected payment method
+        payment_method = PaymentMethod.query.get(int(form.payment_method.data))
+        
         # Create order
         order = Order(
             user_id=current_user.id,
@@ -146,6 +162,9 @@ def checkout():
             shipping_address=form.shipping_address.data,
             phone=form.phone.data
         )
+        
+        # Add payment method reference to order (you might want to add this field to Order model)
+        # For now, we'll handle it in the payment route
         db.session.add(order)
         db.session.flush()  # Get the order ID
         
@@ -170,7 +189,7 @@ def checkout():
         # Initialize Paystack payment
         return redirect(url_for('main.payment', order_id=order.id))
     
-    return render_template('checkout.html', cart_items=cart_items, total=total, form=form)
+    return render_template('checkout.html', cart_items=cart_items, total=total, form=form, payment_methods=payment_methods)
 
 
 @main_bp.route('/payment/<int:order_id>')

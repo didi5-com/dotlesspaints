@@ -1,0 +1,119 @@
+
+{% extends "admin/base.html" %}
+
+{% block page_title %}Site Customization{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">Site Customization</h4>
+        <a href="{{ url_for('admin.add_customization') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Customization
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if customizations.items %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Element Type</th>
+                            <th>Element Key</th>
+                            <th>Content Preview</th>
+                            <th>Position</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customization in customizations.items %}
+                        <tr>
+                            <td>{{ customization.section.title() }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ customization.element_type.title() }}</span>
+                            </td>
+                            <td><code>{{ customization.element_key }}</code></td>
+                            <td>
+                                {% if customization.element_type == 'image' %}
+                                    <img src="{{ customization.content }}" alt="Preview" style="max-width: 50px; max-height: 50px;">
+                                {% else %}
+                                    {{ customization.content[:50] }}{% if customization.content|length > 50 %}...{% endif %}
+                                {% endif %}
+                            </td>
+                            <td>{{ customization.position_order }}</td>
+                            <td>
+                                <span class="badge bg-{% if customization.is_active %}success{% else %}secondary{% endif %}">
+                                    {% if customization.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('admin.edit_customization', customization_id=customization.id) }}" 
+                                       class="btn btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('admin.delete_customization', customization_id=customization.id) }}" 
+                                          style="display: inline;" onsubmit="return confirm('Are you sure?')">
+                                        <button type="submit" class="btn btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if customizations.pages > 1 %}
+            <nav aria-label="Customizations pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if customizations.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.site_customization', page=customizations.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in customizations.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != customizations.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.site_customization', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if customizations.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.site_customization', page=customizations.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-palette fa-4x text-muted mb-3"></i>
+                <h3>No customizations found</h3>
+                <p class="text-muted">Start customizing your site by adding elements</p>
+                <a href="{{ url_for('admin.add_customization') }}" class="btn btn-primary">Add First Customization</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -80,3 +80,25 @@ class ContactMessage(db.Model):
     message = db.Column(db.Text, nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class SiteCustomization(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    section = db.Column(db.String(50), nullable=False)  # header, hero, about, footer, etc.
+    element_type = db.Column(db.String(30), nullable=False)  # text, image, color, style
+    element_key = db.Column(db.String(100), nullable=False)  # specific identifier
+    content = db.Column(db.Text)  # the actual content
+    style_properties = db.Column(db.Text)  # JSON string for CSS properties
+    position_order = db.Column(db.Integer, default=0)
+    is_active = db.Column(db.Boolean, default=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class PaymentMethod(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)  # Paystack, Bank Transfer, Crypto, etc.
+    method_type = db.Column(db.String(30), nullable=False)  # gateway, manual, crypto
+    is_active = db.Column(db.Boolean, default=True)
+    configuration = db.Column(db.Text)  # JSON string for method-specific config
+    instructions = db.Column(db.Text)  # Instructions for manual methods
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

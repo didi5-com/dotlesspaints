@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, FloatField, IntegerField, BooleanField, SelectField, PasswordField
-from wtforms.validators import DataRequired, Email, Length, NumberRange, EqualTo
+from wtforms import StringField, TextAreaField, FloatField, IntegerField, BooleanField, SelectField, PasswordField, SubmitField, HiddenField
+from wtforms.validators import DataRequired, Email, Length, NumberRange, Optional
 from wtforms.widgets import TextArea
 
 
@@ -51,5 +51,42 @@ class ContactForm(FlaskForm):
 
 
 class CheckoutForm(FlaskForm):
-    shipping_address = TextAreaField('Shipping Address', validators=[DataRequired(), Length(max=200)])
-    phone = StringField('Phone Number', validators=[DataRequired(), Length(max=20)])
+    shipping_address = TextAreaField('Shipping Address', validators=[DataRequired(), Length(min=10, max=500)])
+    phone = StringField('Phone Number', validators=[DataRequired(), Length(min=10, max=20)])
+    payment_method = SelectField('Payment Method', validators=[DataRequired()])
+    submit = SubmitField('Place Order')
+
+
+class SiteCustomizationForm(FlaskForm):
+    section = SelectField('Section', choices=[
+        ('header', 'Header'),
+        ('hero', 'Hero Section'),
+        ('about', 'About Section'),
+        ('footer', 'Footer'),
+        ('general', 'General')
+    ], validators=[DataRequired()])
+    element_type = SelectField('Element Type', choices=[
+        ('text', 'Text'),
+        ('image', 'Image'),
+        ('color', 'Color'),
+        ('style', 'Style')
+    ], validators=[DataRequired()])
+    element_key = StringField('Element Key', validators=[DataRequired(), Length(max=100)])
+    content = TextAreaField('Content')
+    style_properties = TextAreaField('Style Properties (CSS)')
+    position_order = IntegerField('Position Order', default=0)
+    is_active = BooleanField('Active', default=True)
+    submit = SubmitField('Save Customization')
+
+
+class PaymentMethodForm(FlaskForm):
+    name = StringField('Payment Method Name', validators=[DataRequired(), Length(max=50)])
+    method_type = SelectField('Method Type', choices=[
+        ('gateway', 'Payment Gateway'),
+        ('manual', 'Manual Payment'),
+        ('crypto', 'Cryptocurrency')
+    ], validators=[DataRequired()])
+    configuration = TextAreaField('Configuration (JSON)')
+    instructions = TextAreaField('Payment Instructions')
+    is_active = BooleanField('Active', default=True)
+    submit = SubmitField('Save Payment Method')
