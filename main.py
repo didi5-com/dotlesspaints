@@ -1,5 +1,4 @@
-from app import app  # noqa: F401
-from models import db  # Assuming db is imported from models
+from app import app, db
 
 if __name__ == '__main__':
     with app.app_context():

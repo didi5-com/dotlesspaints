@@ -46,21 +46,21 @@ def load_user(user_id):
     from models import User
     return User.query.get(int(user_id))
 
+# Import models and routes after app configuration
+import models  # noqa: F401
+
+# Register blueprints
+from routes import main_bp
+from auth_routes import auth_bp
+from admin_routes import admin_bp
+from google_auth import google_auth
+
+app.register_blueprint(main_bp)
+app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(admin_bp, url_prefix='/admin')
+app.register_blueprint(google_auth)
+
 with app.app_context():
-    # Make sure to import the models here or their tables won't be created
-    import models  # noqa: F401
-    
-    # Register blueprints
-    from routes import main_bp
-    from auth_routes import auth_bp
-    from admin_routes import admin_bp
-    from google_auth import google_auth
-    
-    app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(admin_bp, url_prefix='/admin')
-    app.register_blueprint(google_auth)
-    
     db.create_all()
     
     # Create default admin user if none exists
