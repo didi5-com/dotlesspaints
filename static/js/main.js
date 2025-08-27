@@ -331,6 +331,90 @@ function initSearchFunctionality() {
     });
 }
 
+// Payment method selection
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+    const paymentDetails = document.querySelectorAll('.payment-details');
+
+    paymentMethodRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            paymentDetails.forEach(detail => detail.style.display = 'none');
+            const targetDetail = document.querySelector('[data-payment-method="' + this.value + '"]');
+            if (targetDetail) {
+                targetDetail.style.display = 'block';
+            }
+        });
+    });
+});
+
+// Product image preview
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.querySelector('#image-preview');
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const requiredFields = form.querySelectorAll('[required]');
+            let hasErrors = false;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    hasErrors = true;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            if (hasErrors) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+
+// Quantity controls
+document.addEventListener('DOMContentLoaded', function() {
+    const quantityInputs = document.querySelectorAll('.quantity-input');
+
+    quantityInputs.forEach(input => {
+        const minusBtn = input.parentElement.querySelector('.quantity-minus');
+        const plusBtn = input.parentElement.querySelector('.quantity-plus');
+
+        if (minusBtn) {
+            minusBtn.addEventListener('click', function() {
+                let value = parseInt(input.value);
+                if (value > 1) {
+                    input.value = value - 1;
+                }
+            });
+        }
+
+        if (plusBtn) {
+            plusBtn.addEventListener('click', function() {
+                let value = parseInt(input.value);
+                const max = parseInt(input.getAttribute('max')) || 999;
+                if (value < max) {
+                    input.value = value + 1;
+                }
+            });
+        }
+    });
+});
+
 // Utility functions
 function showNotification(message, type = 'info') {
     // Create notification element

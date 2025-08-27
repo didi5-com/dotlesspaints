@@ -53,20 +53,24 @@ import models  # noqa: F401
 from routes import main_bp
 from auth_routes import auth_bp
 from admin_routes import admin_bp
-from google_auth import google_auth
+from google_auth import google_auth_bp
 
 app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(admin_bp, url_prefix='/admin')
-app.register_blueprint(google_auth)
+app.register_blueprint(google_auth_bp, url_prefix='/google_auth')
+
+# Register template filters
+from utils import from_json
+app.jinja_env.filters['from_json'] = from_json
 
 with app.app_context():
     db.create_all()
-    
+
     # Create default admin user if none exists
     from models import User
     from werkzeug.security import generate_password_hash
-    
+
     admin_user = User.query.filter_by(email='admin@doctlesspaint.com').first()
     if not admin_user:
         admin_user = User(

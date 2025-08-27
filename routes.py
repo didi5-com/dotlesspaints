@@ -155,16 +155,19 @@ def checkout():
         # Get selected payment method
         payment_method = PaymentMethod.query.get(int(form.payment_method.data))
         
+        if not payment_method:
+            flash('Invalid payment method selected.', 'error')
+            return render_template('checkout.html', cart_items=cart_items, total=total, form=form, payment_methods=payment_methods)
+        
         # Create order
         order = Order(
             user_id=current_user.id,
             total_amount=total,
             shipping_address=form.shipping_address.data,
-            phone=form.phone.data
+            phone=form.phone.data,
+            payment_method_id=payment_method.id
         )
         
-        # Add payment method reference to order (you might want to add this field to Order model)
-        # For now, we'll handle it in the payment route
         db.session.add(order)
         db.session.flush()  # Get the order ID
         
@@ -186,7 +189,7 @@ def checkout():
         CartItem.query.filter_by(user_id=current_user.id).delete()
         db.session.commit()
         
-        # Initialize Paystack payment
+        # Redirect to payment based on payment method type
         return redirect(url_for('main.payment', order_id=order.id))
     
     return render_template('checkout.html', cart_items=cart_items, total=total, form=form, payment_methods=payment_methods)
@@ -285,6 +288,36 @@ def contact():
         return redirect(url_for('main.contact'))
     
     return render_template('contact.html', form=form)
+
+
+@main_bp.route('/confirm_manual_payment/<int:order_id>', methods=['POST'])
+@login_required
+def confirm_manual_payment(order_id):
+    order = Order.query.filter_by(id=order_id, user_id=current_user.id).first_or_404()
+    
+    if order.payment_status == 'paid':
+        return jsonify({'success': False, 'message': 'Order already paid'})
+    
+    order.payment_status = 'pending_verification'
+    order.status = 'pending_verification'
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Payment confirmation received'})
+
+
+@main_bp.route('/confirm_crypto_payment/<int:order_id>', methods=['POST'])
+@login_required
+def confirm_crypto_payment(order_id):
+    order = Order.query.filter_by(id=order_id, user_id=current_user.id).first_or_404()
+    
+    if order.payment_status == 'paid':
+        return jsonify({'success': False, 'message': 'Order already paid'})
+    
+    order.payment_status = 'pending_verification'
+    order.status = 'pending_verification'
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Crypto payment confirmation received'})
 
 
 @main_bp.route('/about')

@@ -94,3 +94,11 @@ def format_payment_config(config_json):
         return json.loads(config_json)
     except json.JSONDecodeError:
         return {}
+
+
+def from_json(value):
+    """Template filter to parse JSON strings"""
+    try:
+        return json.loads(value) if value else {}
+    except:
+        return {}

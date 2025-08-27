@@ -55,6 +55,7 @@ class Order(db.Model):
     status = db.Column(db.String(20), default='pending')  # pending, confirmed, shipped, delivered, cancelled
     payment_status = db.Column(db.String(20), default='pending')  # pending, paid, failed, refunded
     payment_reference = db.Column(db.String(100))  # Paystack reference
+    payment_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
     shipping_address = db.Column(db.Text)
     phone = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -62,6 +63,7 @@ class Order(db.Model):
     
     # Relationships
     order_items = db.relationship('OrderItem', backref='order', lazy=True, cascade='all, delete-orphan')
+    payment_method = db.relationship('PaymentMethod', backref='orders', lazy=True)
 
 
 class OrderItem(db.Model):

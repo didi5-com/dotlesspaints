@@ -117,6 +117,37 @@
                             <strong>Total</strong>
                             <strong class="text-primary fs-4">₦{{ "{:,.0f}".format(total) }}</strong>
                         </div>
+                        <!-- Payment Method Selection -->
+                        <div class="mb-4">
+                            {{ form.payment_method.label(class="form-label fw-bold") }}
+                            {% for method in payment_methods %}
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_{{ method.id }}" value="{{ method.id }}" required>
+                                <label class="form-check-label" for="payment_{{ method.id }}">
+                                    <strong>{{ method.name }}</strong>
+                                    {% if method.method_type == 'manual' %}
+                                        <small class="text-muted d-block">(Bank Transfer)</small>
+                                    {% elif method.method_type == 'crypto' %}
+                                        <small class="text-muted d-block">(Cryptocurrency)</small>
+                                    {% elif method.method_type == 'gateway' %}
+                                        <small class="text-muted d-block">(Card Payment)</small>
+                                    {% endif %}
+                                </label>
+
+                                <!-- Payment method details -->
+                                <div class="payment-details mt-2 p-2 bg-light rounded" data-payment-method="{{ method.id }}" style="display: none;">
+                                    <small class="text-muted">{{ method.instructions }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% if form.payment_method.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.payment_method.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-success btn-lg">
                                 <i class="fas fa-lock"></i> Place Order
@@ -155,4 +186,27 @@
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+    
+    paymentMethodRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const selectedMethodId = this.value;
+            
+            // Hide all payment details
+            document.querySelectorAll('.payment-details').forEach(detailDiv => {
+                detailDiv.style.display = 'none';
+            });
+            
+            // Show details for the selected payment method
+            const detailsToShow = document.querySelector(`.payment-details[data-payment-method="${selectedMethodId}"]`);
+            if (detailsToShow) {
+                detailsToShow.style.display = 'block';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
