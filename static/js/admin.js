@@ -70,17 +70,22 @@ function initializeDataTables() {
     const searchInputs = document.querySelectorAll('[data-table-search]');
 
     searchInputs.forEach(input => {
-        const targetTable = document.querySelector(input.getAttribute('data-table-search'));
-        if (targetTable) {
-            input.addEventListener('input', function() {
-                filterTable(targetTable, this.value);
-            });
+        const targetSelector = input.getAttribute('data-table-search');
+        if (targetSelector && targetSelector !== '#') {
+            const targetTable = document.querySelector(targetSelector);
+            if (targetTable) {
+                input.addEventListener('input', function() {
+                    filterTable(targetTable, this.value);
+                });
+            }
         }
     });
 }
 
 // Filter table rows based on search term
 function filterTable(table, searchTerm) {
+    if (!table) return;
+    
     const rows = table.querySelectorAll('tbody tr');
     const term = searchTerm.toLowerCase();
 
