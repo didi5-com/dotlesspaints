@@ -24,10 +24,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('main.index') }}">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" 
-                     alt="Dotless Paints Logo" 
-                     class="me-2" 
-                     style="height: 40px; width: auto; filter: brightness(0) invert(1);">
+                <img src="{{ url_for('static', filename='images/dotless-logo-new.png') }}" alt="Dotless Paints" class="me-2" style="height: 40px; width: auto; filter: brightness(0) invert(1);">
                 <span>DOTLESS PAINTS</span>
             </a>
 

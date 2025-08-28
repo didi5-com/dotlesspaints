@@ -21,11 +21,15 @@ if __name__ == '__main__':
             if 'payment_method_id' not in column_names:
                 print("Adding payment_method_id column to order table...")
                 
-                # Add the column
-                db.engine.execute(text('ALTER TABLE "order" ADD COLUMN payment_method_id INTEGER'))
+                # Add the column using the new SQLAlchemy syntax
+                with db.engine.connect() as connection:
+                    connection.execute(text('ALTER TABLE "order" ADD COLUMN payment_method_id INTEGER'))
+                    connection.commit()
                 
                 # Add foreign key constraint
-                db.engine.execute(text('ALTER TABLE "order" ADD CONSTRAINT fk_order_payment_method FOREIGN KEY (payment_method_id) REFERENCES payment_method(id)'))
+                with db.engine.connect() as connection:
+                    connection.execute(text('ALTER TABLE "order" ADD CONSTRAINT fk_order_payment_method FOREIGN KEY (payment_method_id) REFERENCES payment_method(id)'))
+                    connection.commit()
                 
                 print("payment_method_id column added successfully!")
             else:
