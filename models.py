@@ -17,10 +17,13 @@ class User(UserMixin, db.Model):
     google_id = db.Column(db.String(100), unique=True)
     facebook_id = db.Column(db.String(100), unique=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     # Relationships
     orders = db.relationship('Order', backref='user', lazy=True)
-    cart_items = db.relationship('CartItem', backref='user', lazy=True, cascade='all, delete-orphan')
+    cart_items = db.relationship('CartItem',
+                                 backref='user',
+                                 lazy=True,
+                                 cascade='all, delete-orphan')
 
 
 class Product(db.Model):
@@ -34,7 +37,7 @@ class Product(db.Model):
     stock_quantity = db.Column(db.Integer, default=0)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     # Relationships
     cart_items = db.relationship('CartItem', backref='product', lazy=True)
     order_items = db.relationship('OrderItem', backref='product', lazy=True)
@@ -43,7 +46,9 @@ class Product(db.Model):
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    product_id = db.Column(db.Integer,
+                           db.ForeignKey('product.id'),
+                           nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -52,24 +57,37 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     total_amount = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), default='pending')  # pending, confirmed, shipped, delivered, cancelled
-    payment_status = db.Column(db.String(20), default='pending')  # pending, paid, failed, refunded
+    status = db.Column(
+        db.String(20),
+        default='pending')  # pending, confirmed, shipped, delivered, cancelled
+    payment_status = db.Column(
+        db.String(20), default='pending')  # pending, paid, failed, refunded
     payment_reference = db.Column(db.String(100))  # Paystack reference
-    payment_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
+    payment_method_id = db.Column(db.Integer,
+                                  db.ForeignKey('payment_method.id'))
     shipping_address = db.Column(db.Text)
     phone = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    updated_at = db.Column(db.DateTime,
+                           default=datetime.utcnow,
+                           onupdate=datetime.utcnow)
+
     # Relationships
-    order_items = db.relationship('OrderItem', backref='order', lazy=True, cascade='all, delete-orphan')
-    payment_method = db.relationship('PaymentMethod', backref='orders', lazy=True)
+    order_items = db.relationship('OrderItem',
+                                  backref='order',
+                                  lazy=True,
+                                  cascade='all, delete-orphan')
+    payment_method = db.relationship('PaymentMethod',
+                                     backref='orders',
+                                     lazy=True)
 
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    product_id = db.Column(db.Integer,
+                           db.ForeignKey('product.id'),
+                           nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     unit_price = db.Column(db.Float, nullable=False)
     total_price = db.Column(db.Float, nullable=False)
@@ -86,21 +104,39 @@ class ContactMessage(db.Model):
 
 class SiteCustomization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    section = db.Column(db.String(50), nullable=False)  # header, hero, about, footer, etc.
-    element_type = db.Column(db.String(30), nullable=False)  # text, image, color, style
-    element_key = db.Column(db.String(100), nullable=False)  # specific identifier
+    section = db.Column(db.String(50),
+                        nullable=False)  # header, hero, about, footer, etc.
+    element_type = db.Column(db.String(30),
+                             nullable=False)  # text, image, color, style
+    element_key = db.Column(db.String(100),
+                            nullable=False)  # specific identifier
     content = db.Column(db.Text)  # the actual content
     style_properties = db.Column(db.Text)  # JSON string for CSS properties
     position_order = db.Column(db.Integer, default=0)
     is_active = db.Column(db.Boolean, default=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.DateTime,
+                           default=datetime.utcnow,
+                           onupdate=datetime.utcnow)
 
 
 class PaymentMethod(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)  # Paystack, Bank Transfer, Crypto, etc.
-    method_type = db.Column(db.String(30), nullable=False)  # gateway, manual, crypto
+    name = db.Column(db.String(50),
+                     nullable=False)  # Paystack, Bank Transfer, Crypto, etc.
+    method_type = db.Column(db.String(30),
+                            nullable=False)  # gateway, manual, crypto
     is_active = db.Column(db.Boolean, default=True)
-    configuration = db.Column(db.Text)  # JSON string for method-specific config
+    configuration = db.Column(
+        db.Text)  # JSON string for method-specific config
     instructions = db.Column(db.Text)  # Instructions for manual methods
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Customization(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    site_name = db.Column(db.String(100), nullable=False)
+    theme_color = db.Column(db.String(50), nullable=False, default="blue")
+    logo = db.Column(db.String(200), nullable=True)
+
+    def __repr__(self):
+        return f"<Customization {self.site_name}>"
