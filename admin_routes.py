@@ -8,6 +8,11 @@ from werkzeug.security import check_password_hash
 from models import Customization  # make sure you have this model defined
 from models import PaymentMethod
 from forms import PaymentMethodForm
+from werkzeug.utils import secure_filename
+from models import News
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png','jpg','jpeg','gif'}
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -411,3 +416,12 @@ def delete_payment_method(method_id):
     db.session.commit()
     flash("Payment method deleted successfully!", "success")
     return redirect(url_for('admin.payment_methods'))
+
+
+# --- Manage News ---
+@admin_bp.route('/news', methods=['GET'])
+@login_required
+@admin_required
+def news_list():
+    news = News.query.order_by(News.created_at.desc()).all()
+    return render_template('admin/news_list.html', news=news)

@@ -7,6 +7,7 @@ from utils import get_site_customization, get_site_styles, get_active_payment_me
 import requests
 import os
 import json
+from models import News
 
 main_bp = Blueprint('main', __name__)
 
@@ -323,3 +324,10 @@ def confirm_crypto_payment(order_id):
 @main_bp.route('/about')
 def about():
     return render_template('about.html')
+
+
+@main_bp.route('/news')
+@login_required
+def user_news():
+    news = News.query.order_by(News.created_at.desc()).all()
+    return render_template('news.html', news=news)

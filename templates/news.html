@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2>Latest News</h2>
+    {% if news %}
+        {% for item in news %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.content }}</p>
+
+                    {% if item.media_url %}
+                        {% if item.media_url.endswith(('.png','.jpg','.jpeg','.gif')) %}
+                            <img src="{{ item.media_url }}" class="img-fluid mt-2">
+                        {% elif item.media_url.endswith(('.mp4','.webm','.ogg')) %}
+                            <video controls class="mt-2" width="100%">
+                                <source src="{{ item.media_url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        {% endif %}
+                    {% endif %}
+
+                    <p class="text-muted small">Posted on {{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No news yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
